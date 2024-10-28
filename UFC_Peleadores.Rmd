@@ -3,9 +3,7 @@ title: "UFC Fighters "
 output: html_notebook
 ---
 
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code.
-
-Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*.
+## Obserbación y limpieza de datos
 
 ```{r}
 ruta_archivo <- "C:\\Users\\usuario\\Downloads\\ufc-fighters-statistics.csv" 
@@ -15,11 +13,31 @@ head(ufc_data)
 ```
 
 ```{r}
-
+str(ufc_data)
 ```
 
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+```{r}
+ufc_data[ufc_data == ""] <- NA
+missing_counts <- colSums(is.na(ufc_data))
 
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+print(missing_counts)
+```
 
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+```{r}
+peleadores_sin_altura <- ufc_data[is.na(ufc_data$height_cm), ]
+print(peleadores_sin_altura)
+```
+
+```{r}
+ufc_data$record <- paste(ufc_data$wins, ufc_data$draws, ufc_data$losses, sep = "-")
+
+head(ufc_data[, c("wins", "draws", "losses", "record")])
+```
+```{r}
+peleadores_invictos <- ufc_data[ufc_data$record %in% grep("^[0-9]+-0-0$", ufc_data$record, value = TRUE), ]
+
+peleadores_invictos <- peleadores_invictos[, c("name", "record")]
+
+print(peleadores_invictos)
+```
+He observado los datos y los he limpiado de la siguiente forma, lo primero a consistido en camviar los valores vacios por 'NA', y luego he agrupado las columnas de victorias, empates y derrotas, en una columna llamada record, posteriormente he probado que pueda trabajar con ella poniendole trabas como que tanto los empates como las derrotas seán 0.  
